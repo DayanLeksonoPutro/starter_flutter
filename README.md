@@ -22,8 +22,11 @@ Template Flutter untuk Android dengan arsitektur siap pakai. Clone, ubah config,
 - Dark mode & light mode
 - Bilingual: English / Indonesia
 - 3-tab bottom navigation
+- Onboarding 3 slide (cupertino_icons, skip, persisted)
 - Settings screen (share, rate, privacy policy, about)
 - SQLite wrapper siap pakai
+- `LoadingState` enum (idle / loading / success / error)
+- `AppDialog` helper — loading overlay, confirm dialog, snackbar satu baris
 - Tema terpusat (warna, spacing, radius)
 
 ---
@@ -36,19 +39,24 @@ lib/
 ├── app.dart
 ├── core/
 │   ├── constants/
-│   │   ├── app_config.dart      # Nama app, URL store, versi
-│   │   ├── app_colors.dart      # Palette warna
-│   │   ├── app_theme.dart       # Spacing, radius, font
-│   │   └── app_strings.dart     # Teks EN / ID
+│   │   ├── app_config.dart        # Nama app, URL store, versi
+│   │   ├── app_colors.dart        # Palette warna
+│   │   ├── app_theme.dart         # Spacing, radius, font
+│   │   └── app_strings.dart       # Teks EN / ID
 │   ├── database/
-│   │   └── database_helper.dart # Singleton SQLite
-│   └── providers/
-│       └── settings_provider.dart
+│   │   └── database_helper.dart   # Singleton SQLite
+│   ├── providers/
+│   │   └── settings_provider.dart # ThemeMode + locale + onboardingDone
+│   └── utils/
+│       └── loading_state.dart     # Enum idle/loading/success/error
 ├── features/
 │   ├── home/
 │   ├── list/
+│   ├── onboarding/                # 3-slide onboarding + skip
 │   └── settings/
 └── shared/
+    ├── utils/
+    │   └── app_dialog.dart        # Loading overlay, confirm, snackbar
     └── widgets/
         └── bottom_nav.dart
 ```
@@ -104,3 +112,4 @@ flutter build appbundle --release
 - [ ] `version` & `buildNumber` di `pubspec.yaml`
 - [ ] Signing key di `android/app/build.gradle.kts`
 - [ ] Test dark mode, ganti bahasa, buka URL privacy policy
+- [ ] Ganti konten onboarding (`_slides` + key di `app_strings.dart`)

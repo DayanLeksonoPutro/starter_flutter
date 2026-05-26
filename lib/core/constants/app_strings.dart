@@ -40,6 +40,17 @@ class AppStrings {
 
       // Share
       'share_text': 'Check out this app! Download it now.',
+
+      // Onboarding
+      'onboarding_skip': 'Skip',
+      'onboarding_next': 'Next',
+      'onboarding_start': 'Get Started',
+      'onboarding_1_title': 'Welcome',
+      'onboarding_1_subtitle': 'Your new project starts here. Customize and build your app.',
+      'onboarding_2_title': 'Fast & Powerful',
+      'onboarding_2_subtitle': 'Built with modern Flutter architecture, ready for any feature.',
+      'onboarding_3_title': "You're All Set",
+      'onboarding_3_subtitle': 'Tap Get Started to begin your experience.',
     },
     'id': {
       // Nav
@@ -77,6 +88,17 @@ class AppStrings {
 
       // Share
       'share_text': 'Coba aplikasi ini! Unduh sekarang.',
+
+      // Onboarding
+      'onboarding_skip': 'Lewati',
+      'onboarding_next': 'Lanjut',
+      'onboarding_start': 'Mulai',
+      'onboarding_1_title': 'Selamat Datang',
+      'onboarding_1_subtitle': 'Proyek baru Anda dimulai di sini. Sesuaikan dan kembangkan aplikasi Anda.',
+      'onboarding_2_title': 'Cepat & Canggih',
+      'onboarding_2_subtitle': 'Dibangun dengan arsitektur Flutter modern, siap untuk fitur apa pun.',
+      'onboarding_3_title': 'Siap Digunakan',
+      'onboarding_3_subtitle': 'Ketuk Mulai untuk memulai pengalaman Anda.',
     },
   };
 

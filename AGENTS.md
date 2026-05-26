@@ -25,7 +25,7 @@ Starter template Flutter untuk target **Android**. Setiap project baru cukup clo
 ```
 lib/
 ├── main.dart                        # Entry point, inisialisasi provider
-├── app.dart                         # MaterialApp, theme, routing root
+├── app.dart                         # MaterialApp, theme, routing root (cek onboarding)
 ├── core/
 │   ├── constants/
 │   │   ├── app_colors.dart          # ★ PALETTE — edit warna di sini
@@ -34,16 +34,22 @@ lib/
 │   │   └── app_strings.dart         # Teks dua bahasa (en / id)
 │   ├── database/
 │   │   └── database_helper.dart     # Singleton SQLite wrapper
-│   └── providers/
-│       └── settings_provider.dart   # ThemeMode + locale (persisted)
+│   ├── providers/
+│   │   └── settings_provider.dart   # ThemeMode + locale + onboardingDone (persisted)
+│   └── utils/
+│       └── loading_state.dart       # Enum: idle / loading / success / error
 ├── features/
 │   ├── home/
 │   │   └── home_screen.dart         # Layar Beranda (dummy)
 │   ├── list/
 │   │   └── list_screen.dart         # Layar Daftar (dummy)
+│   ├── onboarding/
+│   │   └── onboarding_screen.dart   # 3-slide onboarding + skip (cupertino_icons)
 │   └── settings/
 │       └── settings_screen.dart     # Dark mode, bahasa, about, share, rate, privacy
 └── shared/
+    ├── utils/
+    │   └── app_dialog.dart          # showLoading / hideLoading / confirm / showSnackbar
     └── widgets/
         └── bottom_nav.dart          # BottomNavigationBar 3 tab
 ```
@@ -80,7 +86,53 @@ Text(s('key_name'))
 
 ---
 
-## 4. Panduan Menambah Fitur
+## 4. Utility Siap Pakai
+
+### `LoadingState` — `lib/core/utils/loading_state.dart`
+Gunakan di setiap provider yang punya operasi async:
+```dart
+LoadingState _state = LoadingState.idle;
+LoadingState get state => _state;
+
+Future<void> fetchData() async {
+  _state = LoadingState.loading; notifyListeners();
+  try {
+    // ...
+    _state = LoadingState.success;
+  } catch (_) {
+    _state = LoadingState.error;
+  }
+  notifyListeners();
+}
+```
+Di widget: `if (provider.state.isLoading) CircularProgressIndicator()`
+
+### `AppDialog` — `lib/shared/utils/app_dialog.dart`
+```dart
+// Loading overlay
+AppDialog.showLoading(context);
+await doSomething();
+AppDialog.hideLoading(context);
+
+// Konfirmasi
+final ok = await AppDialog.confirm(context, title: 'Hapus?', message: 'Data akan dihapus.');
+if (ok) { /* lanjut */ }
+
+// Snackbar
+AppDialog.showSnackbar(context, 'Berhasil disimpan');
+AppDialog.showSnackbar(context, 'Gagal', isError: true);
+```
+
+### Onboarding — `lib/features/onboarding/onboarding_screen.dart`
+- 3 slide dengan icon `CupertinoIcons`, title, subtitle
+- Tombol Skip + dots indicator + Next / Get Started
+- Status disimpan via `SettingsProvider.completeOnboarding()` → SharedPreferences
+- `app.dart` otomatis route ke `MainNavigation` jika onboarding sudah selesai
+- **Ganti konten:** edit konstanta `_slides` di `_OnboardingScreenState` dan key string di `app_strings.dart`
+
+---
+
+## 6. Panduan Menambah Fitur
 
 ### Menambah screen baru
 1. Buat file di `lib/features/<nama_fitur>/<nama>_screen.dart`
@@ -103,7 +155,7 @@ Tambahkan `ListTile` baru di `lib/features/settings/settings_screen.dart` di dal
 
 ---
 
-## 5. Aturan Kode
+## 7. Aturan Kode
 
 - **State management**: Provider only. Jangan tambah Bloc/Riverpod/GetX kecuali diminta eksplisit.
 - **Warna**: Selalu ambil dari `AppColors` atau `Theme.of(context).colorScheme`. Jangan hardcode `Color(0xFF...)` di widget.
@@ -114,7 +166,7 @@ Tambahkan `ListTile` baru di `lib/features/settings/settings_screen.dart` di dal
 
 ---
 
-## 6. Menjalankan & Build
+## 8. Menjalankan & Build
 
 ```bash
 # Install dependencies
@@ -132,7 +184,7 @@ flutter build appbundle --release
 
 ---
 
-## 7. Checklist Sebelum Publish
+## 9. Checklist Sebelum Publish
 
 - [ ] Ganti `appName`, `playStoreUrl`, `privacyPolicyUrl` di `app_config.dart`
 - [ ] Ganti `applicationId` di `android/app/build.gradle`
@@ -143,3 +195,5 @@ flutter build appbundle --release
 - [ ] Set `version` dan `buildNumber` di `pubspec.yaml`
 - [ ] Aktifkan signing di `android/app/build.gradle`
 - [ ] Test dark mode, ganti bahasa, dan buka URL privacy policy
+- [ ] Ganti konten onboarding (`_slides` + key di `app_strings.dart`)
+- [ ] Pastikan onboarding hanya muncul sekali (test uninstall/reinstall)

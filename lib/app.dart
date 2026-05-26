@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/constants/app_config.dart';
 import 'core/constants/app_theme.dart';
 import 'core/providers/settings_provider.dart';
+import 'features/onboarding/onboarding_screen.dart';
 import 'shared/widgets/bottom_nav.dart';
 
 class App extends StatelessWidget {
@@ -18,7 +19,9 @@ class App extends StatelessWidget {
           themeMode: settings.themeMode,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
-          home: const MainNavigation(),
+          home: settings.onboardingDone
+              ? const MainNavigation()
+              : const OnboardingScreen(),
         );
       },
     );
