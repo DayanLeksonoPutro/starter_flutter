@@ -20,23 +20,14 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: Text(s('settings_title'))),
       body: ListView(
         children: [
-          _SectionHeader(label: s('about')),
-          Text(
-            AppConfig.appName,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: AppTheme.spacingXs),
-          Text('v${AppConfig.version}'),
-          const SizedBox(height: AppTheme.spacingMd),
-          Text(s('about_desc')),
-          // ── Appearance section ────────────────────────────────────────────
+          // ── Appearance ────────────────────────────────────────────────────
           _SectionHeader(label: s('settings_appearance')),
 
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode_outlined),
             title: Text(s('settings_dark_mode')),
             value: settings.isDarkMode,
-            onChanged: (v) => settings.toggleDarkMode(v),
+            onChanged: settings.toggleDarkMode,
           ),
 
           ListTile(
@@ -53,13 +44,34 @@ class SettingsScreen extends StatelessWidget {
                 const Icon(Icons.chevron_right, size: 20),
               ],
             ),
-            onTap: () => _showLanguagePicker(context, settings, s),
+            onTap: () => _showLanguagePicker(context, settings),
           ),
 
           const Divider(),
 
-          // ── About section ─────────────────────────────────────────────────
+          // ── About ─────────────────────────────────────────────────────────
           _SectionHeader(label: s('settings_about')),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingMd,
+              vertical: AppTheme.spacingSm,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppConfig.appName, style: theme.textTheme.titleSmall),
+                Text(
+                  '${s('settings_version')} ${AppConfig.version} (${AppConfig.buildNumber})',
+                  style: theme.textTheme.titleSmall,
+                ),
+                const SizedBox(height: AppTheme.spacingXs),
+                Text(s('about_desc'), style: theme.textTheme.bodySmall),
+
+                const SizedBox(height: AppTheme.spacingSm),
+              ],
+            ),
+          ),
 
           ListTile(
             leading: const Icon(Icons.share_outlined),
@@ -79,29 +91,18 @@ class SettingsScreen extends StatelessWidget {
             trailing: const Icon(Icons.open_in_new, size: 16),
             onTap: () => _openUrl(AppConfig.privacyPolicyUrl),
           ),
-
-          const Divider(),
-
-          // ── Version ───────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
-            child: Center(
-              child: Text(
-                '${s('settings_version')} ${AppConfig.version} (${AppConfig.buildNumber})',
-                style: theme.textTheme.bodySmall,
-              ),
-            ),
+          ListTile(
+            leading: const Icon(Icons.web_outlined),
+            title: Text(s('website')),
+            trailing: const Icon(Icons.open_in_new, size: 16),
+            onTap: () => _openUrl(AppConfig.websiteUrl),
           ),
         ],
       ),
     );
   }
 
-  void _showLanguagePicker(
-    BuildContext context,
-    SettingsProvider settings,
-    String Function(String) s,
-  ) {
+  void _showLanguagePicker(BuildContext context, SettingsProvider settings) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -109,79 +110,45 @@ class SettingsScreen extends StatelessWidget {
           top: Radius.circular(AppTheme.radiusLg),
         ),
       ),
-      builder: (_) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: AppTheme.spacingSm),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacingMd),
-              _LanguageTile(
-                label: 'English',
-                value: 'en',
-                selected: settings.locale == 'en',
-                onTap: () {
-                  settings.setLocale('en');
-                  Navigator.pop(context);
-                },
-              ),
-              _LanguageTile(
-                label: 'Indonesia',
-                value: 'id',
-                selected: settings.locale == 'id',
-                onTap: () {
-                  settings.setLocale('id');
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: AppTheme.spacingMd),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showAboutDialog(BuildContext context, String Function(String) s) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(s('about_title')),
-        content: Column(
+      builder: (_) => SafeArea(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppConfig.appName,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+            const SizedBox(height: AppTheme.spacingSm),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+              ),
             ),
-            const SizedBox(height: AppTheme.spacingXs),
-            Text('v${AppConfig.version}'),
             const SizedBox(height: AppTheme.spacingMd),
-            Text(s('about_desc')),
+            _LanguageTile(
+              label: 'English',
+              selected: settings.locale == 'en',
+              onTap: () {
+                settings.setLocale('en');
+                Navigator.pop(context);
+              },
+            ),
+            _LanguageTile(
+              label: 'Indonesia',
+              selected: settings.locale == 'id',
+              onTap: () {
+                settings.setLocale('id');
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: AppTheme.spacingMd),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(s('about_close')),
-          ),
-        ],
       ),
     );
   }
 
   Future<void> _shareApp(String Function(String) s) async {
-    // share_plus package for real sharing; kept minimal to avoid extra dep
-    // Replace with: Share.share(s('share_text'));
+    // Tambah package share_plus lalu ganti dengan: Share.share(s('share_text'))
     debugPrint('Share: ${s('share_text')}');
   }
 
@@ -219,12 +186,10 @@ class _SectionHeader extends StatelessWidget {
 class _LanguageTile extends StatelessWidget {
   const _LanguageTile({
     required this.label,
-    required this.value,
     required this.selected,
     required this.onTap,
   });
   final String label;
-  final String value;
   final bool selected;
   final VoidCallback onTap;
 

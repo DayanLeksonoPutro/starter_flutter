@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MONOCHROME LAYER — digunakan Android 13+ untuk themed icon (dark/light wallpaper).
+  Sistem akan apply tint otomatis; gunakan warna putih/hitam solid saja.
+  Shape identik dengan foreground, tanpa warna accent.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Rocket body + nose cone -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,20 L68,52 L68,74 Q68,78 64,78 L44,78 Q40,78 40,74 L40,52 Z" />
+
+    <!-- Left fin -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,62 L28,78 L40,78 Z" />
+
+    <!-- Right fin -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,62 L80,78 L68,78 Z" />
+
+    <!-- Porthole window -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:pathData="M54,42 a8,8 0 1 0 0,16 a8,8 0 1 0 0,-16" />
+
+    <!-- Exhaust flame (monochrome = same white) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M46,78 Q54,92 62,78 Z" />
+
+</vector>

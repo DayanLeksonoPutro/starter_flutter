@@ -9,7 +9,9 @@ class AppConfig {
   static const String appName = 'Starter App';
 
   /// Privacy policy URL — update before releasing
-  static const String privacyPolicyUrl = 'https://yourwebsite.com/privacy-policy';
+  static const String privacyPolicyUrl =
+      'https://yourwebsite.com/privacy-policy';
+  static const String websiteUrl = 'https://yourwebsite.com';
 
   /// Supported locales
   static const List<String> supportedLocales = ['en', 'id'];

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background: brand color dari colors.xml — ganti di sana, bukan di sini -->
+    <background android:drawable="@color/ic_launcher_background" />
+    <!-- Foreground: logo/icon vector -->
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <!-- Monochrome: themed icon untuk Android 13+ (API 33) -->
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+</adaptive-icon>
