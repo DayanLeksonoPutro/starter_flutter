@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/constants/app_config.dart';
 import 'core/constants/app_theme.dart';
 import 'core/providers/settings_provider.dart';
+import 'core/utils/app_transitions.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'shared/widgets/bottom_nav.dart';
 
@@ -19,9 +20,16 @@ class App extends StatelessWidget {
           themeMode: settings.themeMode,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
-          home: settings.onboardingDone
-              ? const MainNavigation()
-              : const OnboardingScreen(),
+          home: AnimatedSwitcher(
+            duration: AppTransitions.duration,
+            transitionBuilder: (child, anim) => FadeTransition(
+              opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
+              child: child,
+            ),
+            child: settings.onboardingDone
+                ? const MainNavigation(key: ValueKey('main'))
+                : const OnboardingScreen(key: ValueKey('onboarding')),
+          ),
         );
       },
     );

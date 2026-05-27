@@ -37,7 +37,8 @@ lib/
 │   ├── providers/
 │   │   └── settings_provider.dart   # ThemeMode + locale + onboardingDone (persisted)
 │   └── utils/
-│       └── loading_state.dart       # Enum: idle / loading / success / error
+│       ├── loading_state.dart       # Enum: idle / loading / success / error
+│       └── app_transitions.dart     # ★ TRANSISI — type & duration di sini
 ├── features/
 │   ├── home/
 │   │   └── home_screen.dart         # Layar Beranda (dummy)
@@ -107,20 +108,47 @@ Future<void> fetchData() async {
 ```
 Di widget: `if (provider.state.isLoading) CircularProgressIndicator()`
 
+### `AppTransitions` — `lib/core/utils/app_transitions.dart`
+Transisi halaman terpusat — ganti satu konstanta untuk swap transisi seluruh app.
+
+```dart
+// ★ Pilih tipe: fadeScale · slideUp · slideRight · fade
+static const AppTransitionType defaultType = AppTransitionType.fadeScale;
+
+// ★ Durasi: 200 (snappy) · 280 (default) · 400 (cinematic)
+static const Duration duration = Duration(milliseconds: 280);
+```
+
+Untuk push ke halaman detail, ganti `Navigator.push` dengan:
+```dart
+// Transisi default (ikut defaultType)
+AppTransitions.push(context, const DetailScreen());
+
+// Override tipe per-halaman
+AppTransitions.push(context, const ModalSheet(), type: AppTransitionType.slideUp);
+```
+
 ### `AppDialog` — `lib/shared/utils/app_dialog.dart`
 ```dart
-// Loading overlay
+// Loading overlay (opsional: tampilkan pesan di bawah spinner)
 AppDialog.showLoading(context);
+AppDialog.showLoading(context, message: 'Menyimpan...');
 await doSomething();
 AppDialog.hideLoading(context);
 
-// Konfirmasi
-final ok = await AppDialog.confirm(context, title: 'Hapus?', message: 'Data akan dihapus.');
+// Konfirmasi — opsional icon + warna di atas judul
+final ok = await AppDialog.confirm(
+  context,
+  title: 'Hapus?',
+  message: 'Data akan dihapus.',
+  icon: Icons.delete_outline,   // opsional
+  iconColor: Colors.red,        // opsional, default: primary
+);
 if (ok) { /* lanjut */ }
 
-// Snackbar
-AppDialog.showSnackbar(context, 'Berhasil disimpan');
-AppDialog.showSnackbar(context, 'Gagal', isError: true);
+// Snackbar — opsional icon di depan teks
+AppDialog.showSnackbar(context, 'Berhasil disimpan', icon: Icons.check_circle_outline);
+AppDialog.showSnackbar(context, 'Gagal', isError: true, icon: Icons.error_outline);
 ```
 
 ### Onboarding — `lib/features/onboarding/onboarding_screen.dart`
@@ -162,7 +190,7 @@ Tambahkan `ListTile` baru di `lib/features/settings/settings_screen.dart` di dal
 - **Spacing / radius**: Gunakan konstanta `AppTheme.spacing*` dan `AppTheme.radius*`.
 - **Teks**: Selalu melalui `AppStrings.get(key, locale)`. Jangan hardcode string UI.
 - **SQLite**: Akses hanya melalui `DatabaseHelper.instance`. Jangan buka database langsung.
-- **Navigasi**: Gunakan `IndexedStack` di `MainNavigation` (sudah ada). Untuk halaman detail gunakan `Navigator.push`.
+- **Navigasi**: Gunakan `IndexedStack` di `MainNavigation` (sudah ada). Untuk halaman detail gunakan `AppTransitions.push` — bukan `Navigator.push` langsung.
 
 ---
 

@@ -4,6 +4,7 @@ import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_theme.dart';
 import '../../core/providers/settings_provider.dart';
 import '../../core/utils/loading_state.dart';
+import '../../shared/utils/app_actions.dart';
 import '../../shared/utils/app_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +18,15 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── Demo: LoadingState ────────────────────────────────────────────────────────
   LoadingState _fetchState = LoadingState.idle;
 
+  Future<void> _shareApp() async {
+    final locale = context.read<SettingsProvider>().locale;
+    await AppActions.shareApp(locale);
+  }
+
+  Future<void> _rateApp() async {
+    await AppActions.rateApp();
+  }
+
   Future<void> _showConfirmDemo() async {
     final ok = await AppDialog.confirm(
       context,
@@ -24,13 +34,19 @@ class _HomeScreenState extends State<HomeScreen> {
       message: 'Tindakan ini tidak dapat dibatalkan.',
       confirmLabel: 'Hapus',
       cancelLabel: 'Batal',
+      icon: Icons.delete_outline,
     );
     if (!mounted) return;
-    AppDialog.showSnackbar(context, ok ? 'Item dihapus' : 'Dibatalkan', isError: ok);
+    AppDialog.showSnackbar(
+      context,
+      ok ? 'Item dihapus' : 'Dibatalkan',
+      isError: ok,
+      icon: ok ? Icons.delete_rounded : Icons.close_rounded,
+    );
   }
 
   Future<void> _showLoadingDemo() async {
-    AppDialog.showLoading(context);
+    AppDialog.showLoading(context, message: 'Memuat data...');
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     AppDialog.hideLoading(context);
@@ -38,21 +54,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _simulateFetch() async {
     setState(() => _fetchState = LoadingState.loading);
-    AppDialog.showLoading(context);
+    AppDialog.showLoading(context, message: 'Mengambil data...');
 
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
     AppDialog.hideLoading(context);
 
-    // Simulate success/error randomly for demo purposes
     final success = DateTime.now().second.isEven;
-    setState(() => _fetchState = success ? LoadingState.success : LoadingState.error);
+    setState(
+      () => _fetchState = success ? LoadingState.success : LoadingState.error,
+    );
 
     AppDialog.showSnackbar(
       context,
       success ? 'Data berhasil dimuat' : 'Gagal memuat data',
       isError: !success,
+      icon: success ? Icons.check_circle_outline : Icons.error_outline,
     );
   }
 
@@ -63,7 +81,21 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(s('home_title'))),
+      appBar: AppBar(
+        title: Text(s('home_title')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'Share',
+            onPressed: _shareApp,
+          ),
+          IconButton(
+            icon: const Icon(Icons.star_outline_rounded),
+            tooltip: 'Rate',
+            onPressed: _rateApp,
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(AppTheme.spacingMd),
         child: Column(
@@ -80,7 +112,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: AppTheme.spacingMd),
                     Text(s('home_welcome'), style: theme.textTheme.titleLarge),
                     const SizedBox(height: AppTheme.spacingXs),
-                    Text(_stateLabel(_fetchState, s), style: theme.textTheme.bodySmall),
+                    Text(
+                      _stateLabel(_fetchState, s),
+                      style: theme.textTheme.bodySmall,
+                    ),
                     const SizedBox(height: AppTheme.spacingMd),
                     FilledButton.icon(
                       onPressed: _fetchState.isLoading ? null : _simulateFetch,
@@ -111,7 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   _DemoCard(
                     icon: Icons.notifications_outlined,
                     label: 'Snackbar OK',
-                    onTap: () => AppDialog.showSnackbar(context, 'Disimpan!'),
+                    onTap: () => AppDialog.showSnackbar(
+                      context,
+                      'Disimpan!',
+                      icon: Icons.check_circle_outline,
+                    ),
                   ),
                   // Error snackbar
                   _DemoCard(
@@ -121,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       'Koneksi gagal',
                       isError: true,
+                      icon: Icons.error_outline,
                     ),
                   ),
                   // Loading overlay only (no state tracking)
@@ -138,7 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _stateLabel(LoadingState state, String Function(String) s) => switch (state) {
+  String _stateLabel(LoadingState state, String Function(String) s) =>
+      switch (state) {
         LoadingState.idle => s('home_subtitle'),
         LoadingState.loading => 'Memuat data…',
         LoadingState.success => 'Data berhasil dimuat.',
@@ -155,21 +196,40 @@ class _StateIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (state) {
-      LoadingState.idle => Icon(Icons.rocket_launch_rounded, size: 40, color: theme.colorScheme.primary),
+      LoadingState.idle => Icon(
+        Icons.rocket_launch_rounded,
+        size: 40,
+        color: theme.colorScheme.primary,
+      ),
       LoadingState.loading => SizedBox(
-          width: 40,
-          height: 40,
-          child: CircularProgressIndicator(strokeWidth: 3, color: theme.colorScheme.primary),
+        width: 40,
+        height: 40,
+        child: CircularProgressIndicator(
+          strokeWidth: 3,
+          color: theme.colorScheme.primary,
         ),
-      LoadingState.success => Icon(Icons.check_circle_rounded, size: 40, color: theme.colorScheme.primary),
-      LoadingState.error => Icon(Icons.error_rounded, size: 40, color: theme.colorScheme.error),
+      ),
+      LoadingState.success => Icon(
+        Icons.check_circle_rounded,
+        size: 40,
+        color: theme.colorScheme.primary,
+      ),
+      LoadingState.error => Icon(
+        Icons.error_rounded,
+        size: 40,
+        color: theme.colorScheme.error,
+      ),
     };
   }
 }
 
 // ── Grid card dengan onTap ────────────────────────────────────────────────────
 class _DemoCard extends StatelessWidget {
-  const _DemoCard({required this.icon, required this.label, required this.onTap});
+  const _DemoCard({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
   final IconData icon;
   final String label;
   final VoidCallback onTap;
@@ -188,7 +248,11 @@ class _DemoCard extends StatelessWidget {
             children: [
               Icon(icon, size: 32, color: theme.colorScheme.primary),
               const SizedBox(height: AppTheme.spacingSm),
-              Text(label, style: theme.textTheme.labelLarge, textAlign: TextAlign.center),
+              Text(
+                label,
+                style: theme.textTheme.labelLarge,
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),

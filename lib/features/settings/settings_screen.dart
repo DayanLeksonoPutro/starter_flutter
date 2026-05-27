@@ -5,6 +5,7 @@ import '../../core/constants/app_config.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_theme.dart';
 import '../../core/providers/settings_provider.dart';
+import '../../shared/utils/app_actions.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -76,13 +77,13 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.share_outlined),
             title: Text(s('settings_share')),
-            onTap: () => _shareApp(s),
+            onTap: () => AppActions.shareApp(locale),
           ),
 
           ListTile(
             leading: const Icon(Icons.star_outline_rounded),
             title: Text(s('settings_rate')),
-            onTap: () => _openUrl(AppConfig.playStoreUrl),
+            onTap: () => AppActions.rateApp(),
           ),
 
           ListTile(
@@ -145,11 +146,6 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _shareApp(String Function(String) s) async {
-    // Tambah package share_plus lalu ganti dengan: Share.share(s('share_text'))
-    debugPrint('Share: ${s('share_text')}');
   }
 
   Future<void> _openUrl(String url) async {

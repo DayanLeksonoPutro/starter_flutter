@@ -3,14 +3,13 @@ import '../../core/constants/app_theme.dart';
 
 abstract class AppDialog {
   /// Show a non-dismissible loading overlay.
-  static void showLoading(BuildContext context) {
+  /// Opsional: tampilkan [message] di bawah spinner.
+  static void showLoading(BuildContext context, {String? message}) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const PopScope(
-        canPop: false,
-        child: _LoadingDialog(),
-      ),
+      builder: (_) =>
+          PopScope(canPop: false, child: _LoadingDialog(message: message)),
     );
   }
 
@@ -20,16 +19,21 @@ abstract class AppDialog {
   }
 
   /// Show a confirmation dialog. Returns true if user taps confirm.
+  /// Opsional: tambah [icon] dan [iconColor] di atas judul.
   static Future<bool> confirm(
     BuildContext context, {
     required String title,
     required String message,
     String confirmLabel = 'OK',
     String cancelLabel = 'Cancel',
+    IconData? icon,
   }) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        icon: icon != null
+            ? Icon(icon, size: 62, color: Theme.of(ctx).colorScheme.primary)
+            : null,
         title: Text(title),
         content: Text(message),
         actions: [
@@ -48,14 +52,30 @@ abstract class AppDialog {
   }
 
   /// Show a floating snackbar. Pass [isError] true for error styling.
+  /// Opsional: tambah [icon] di depan teks.
   static void showSnackbar(
     BuildContext context,
     String message, {
     bool isError = false,
+    IconData? icon,
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 18,
+                color: isError
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+            ],
+            Expanded(child: Text(message)),
+          ],
+        ),
         backgroundColor: isError
             ? Theme.of(context).colorScheme.error
             : Theme.of(context).colorScheme.primary,
@@ -69,15 +89,25 @@ abstract class AppDialog {
 }
 
 class _LoadingDialog extends StatelessWidget {
-  const _LoadingDialog();
+  const _LoadingDialog({this.message});
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(24),
-          child: CircularProgressIndicator(),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              if (message != null) ...[
+                const SizedBox(height: 16),
+                Text(message!, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ],
+          ),
         ),
       ),
     );

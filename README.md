@@ -26,7 +26,8 @@ Template Flutter untuk Android dengan arsitektur siap pakai. Clone, ubah config,
 - Settings screen (share, rate, privacy policy, about)
 - SQLite wrapper siap pakai
 - `LoadingState` enum (idle / loading / success / error)
-- `AppDialog` helper — loading overlay, confirm dialog, snackbar satu baris
+- `AppDialog` helper — loading overlay, confirm dialog + icon, snackbar + icon
+- `AppTransitions` — custom page transition (fadeScale / slideUp / slideRight / fade), ganti 1 konstanta
 - Tema terpusat (warna, spacing, radius)
 
 ---
@@ -56,7 +57,7 @@ lib/
 │   └── settings/
 └── shared/
     ├── utils/
-    │   └── app_dialog.dart        # Loading overlay, confirm, snackbar
+    │   └── app_dialog.dart        # Loading overlay, confirm + icon, snackbar + icon
     └── widgets/
         └── bottom_nav.dart
 ```
